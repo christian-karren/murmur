@@ -2,7 +2,7 @@
 
 A free, local macOS dictation menu-bar app. Press a global hotkey, speak, press it again — your words appear at the cursor. Built on [WhisperKit](https://github.com/argmaxinc/WhisperKit) so transcription runs on-device, with no API keys and no per-minute fees.
 
-Designed to replace paid dictation tools for everyday use, including inside Claude Code.
+Designed to replace paid dictation tools for everyday use.
 
 Open source under the MIT license — fork it, change it, ship it.
 
@@ -37,7 +37,7 @@ The menu-bar icon flips from yellow to ready as soon as Accessibility is granted
 
 - Press **⌘⇧;** to start recording. The menu bar icon turns red.
 - Press **⌘⇧;** again to stop. splashaudio transcribes and pastes at your cursor.
-- Works in any app — including Claude Code in Terminal/iTerm.
+- Works in any app — including terminal apps like Terminal and iTerm.
 
 The first transcription after launch downloads the model (`base.en`, ~150 MB) to `~/Documents/huggingface/`. After that, transcriptions take roughly half a second for short utterances on Apple Silicon.
 
