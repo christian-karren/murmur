@@ -48,12 +48,12 @@ final class StatusBarController {
             case .idle:
                 button.image = symbol("waveform")
                 button.image?.isTemplate = true
-                statusMenuItem.title = "Ready — ⌘⌥Space to dictate"
+                statusMenuItem.title = "Ready — ⌘⇧; to dictate"
             case .recording:
                 button.image = symbol("mic.fill")
                 button.image?.isTemplate = false
                 button.contentTintColor = .systemRed
-                statusMenuItem.title = "Recording — press ⌘⌥Space to stop"
+                statusMenuItem.title = "Recording — press ⌘⇧; to stop"
             case .transcribing:
                 button.image = symbol("waveform.badge.magnifyingglass")
                 button.image?.isTemplate = true
@@ -75,7 +75,7 @@ final class StatusBarController {
         accessibilityMenuItem.isHidden = true
         menu.addItem(accessibilityMenuItem)
 
-        let hotkeyHint = NSMenuItem(title: "Hotkey: ⌘⌥Space", action: nil, keyEquivalent: "")
+        let hotkeyHint = NSMenuItem(title: "Hotkey: ⌘⇧;", action: nil, keyEquivalent: "")
         hotkeyHint.isEnabled = false
         menu.addItem(hotkeyHint)
 

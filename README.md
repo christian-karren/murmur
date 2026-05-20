@@ -32,8 +32,8 @@ Restart Murmur after granting Accessibility (quit from the menu bar, then re-ope
 
 ## Usage
 
-- Press **⌘⌥Space** to start recording. The menu bar icon turns red.
-- Press **⌘⌥Space** again to stop. Murmur transcribes and pastes at your cursor.
+- Press **⌘⇧;** to start recording. The menu bar icon turns red.
+- Press **⌘⇧;** again to stop. Murmur transcribes and pastes at your cursor.
 - Works in any app — including Claude Code in Terminal/iTerm.
 
 The first transcription after launch downloads the model (`base.en`, ~150 MB) to `~/Documents/huggingface/`. After that, transcriptions take roughly half a second for short utterances on Apple Silicon.

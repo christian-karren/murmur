@@ -9,8 +9,10 @@ final class HotkeyManager {
 
     func register() {
         let keyID = EventHotKeyID(signature: fourCharCode("MURM"), id: 1)
-        let modifiers: UInt32 = UInt32(cmdKey | optionKey)
-        let keyCode: UInt32 = UInt32(kVK_Space)
+        // Cmd+Shift+; — Cmd+Option+Space is reserved by Spotlight on macOS and
+        // gets intercepted by the OS before reaching our handler.
+        let modifiers: UInt32 = UInt32(cmdKey | shiftKey)
+        let keyCode: UInt32 = UInt32(kVK_ANSI_Semicolon)
 
         let registerStatus = RegisterEventHotKey(
             keyCode,
@@ -24,6 +26,7 @@ final class HotkeyManager {
             NSLog("Murmur: failed to register hotkey (status \(registerStatus))")
             return
         }
+        NSLog("Murmur: hotkey ⌘⇧; registered")
 
         var eventSpec = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
@@ -37,6 +40,7 @@ final class HotkeyManager {
             { _, _, userData -> OSStatus in
                 guard let userData else { return noErr }
                 let manager = Unmanaged<HotkeyManager>.fromOpaque(userData).takeUnretainedValue()
+                NSLog("Murmur: hotkey fired")
                 DispatchQueue.main.async { manager.onPress?() }
                 return noErr
             },
