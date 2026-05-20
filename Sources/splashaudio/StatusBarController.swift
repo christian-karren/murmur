@@ -1,6 +1,6 @@
 import AppKit
 
-enum MurmurState {
+enum AppState {
     case loading(String)
     case needsAccessibility
     case idle
@@ -28,7 +28,7 @@ final class StatusBarController {
         setState(.loading("Starting…"))
     }
 
-    func setState(_ state: MurmurState) {
+    func setState(_ state: AppState) {
         DispatchQueue.main.async { [self] in
             guard let button = item.button else { return }
             button.contentTintColor = nil
@@ -81,7 +81,7 @@ final class StatusBarController {
 
         menu.addItem(.separator())
 
-        let quit = NSMenuItem(title: "Quit Murmur", action: #selector(handleQuit), keyEquivalent: "q")
+        let quit = NSMenuItem(title: "Quit splashaudio", action: #selector(handleQuit), keyEquivalent: "q")
         quit.target = self
         menu.addItem(quit)
 

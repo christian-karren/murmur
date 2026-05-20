@@ -7,7 +7,7 @@ final class AudioRecorder: NSObject {
 
     func start() throws {
         let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("murmur-\(UUID().uuidString)")
+            .appendingPathComponent("splashaudio-\(UUID().uuidString)")
             .appendingPathExtension("wav")
 
         let settings: [String: Any] = [
@@ -23,7 +23,7 @@ final class AudioRecorder: NSObject {
         recorder.delegate = self
         guard recorder.prepareToRecord(), recorder.record() else {
             throw NSError(
-                domain: "Murmur.AudioRecorder",
+                domain: "splashaudio.AudioRecorder",
                 code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "Recorder refused to start. Check microphone permission in System Settings."]
             )

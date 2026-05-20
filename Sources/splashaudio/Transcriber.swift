@@ -23,7 +23,7 @@ actor Transcriber {
                 .joined(separator: " ")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
         } catch {
-            NSLog("Murmur: transcription failed: \(error)")
+            NSLog("splashaudio: transcription failed: \(error)")
             return ""
         }
     }

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Build Murmur.app from the swift package.
-# Produces ./Murmur.app — drop into /Applications and add to Accessibility.
+# Build splashaudio.app from the swift package.
+# Produces ./splashaudio.app — drop into /Applications and add to Accessibility.
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
-APP_NAME="Murmur"
+APP_NAME="splashaudio"
 BUNDLE="${APP_NAME}.app"
 BUILD_CFG="release"
 
@@ -44,6 +44,6 @@ echo ""
 echo "Next steps:"
 echo "  1. mv ${BUNDLE} /Applications/"
 echo "  2. Open /Applications/${BUNDLE} once (Right-click → Open the first time)."
-echo "  3. System Settings → Privacy & Security → Accessibility → add Murmur."
-echo "  4. System Settings → Privacy & Security → Microphone → enable Murmur."
+echo "  3. System Settings → Privacy & Security → Accessibility → add splashaudio."
+echo "  4. System Settings → Privacy & Security → Microphone → enable splashaudio."
 echo "  5. Press ⌘⇧; anywhere to dictate."

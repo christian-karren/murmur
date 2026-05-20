@@ -37,7 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             } catch {
                 await MainActor.run {
                     self.statusBar.setState(.error("Model failed to load"))
-                    NSLog("Murmur: model load failed: \(error)")
+                    NSLog("splashaudio: model load failed: \(error)")
                 }
             }
         }
@@ -115,7 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 try recorder.start()
                 statusBar.setState(.recording)
             } catch {
-                NSLog("Murmur: couldn't start recording: \(error)")
+                NSLog("splashaudio: couldn't start recording: \(error)")
                 statusBar.setState(.error("Recording failed — check Microphone permission"))
                 NSSound.beep()
             }
