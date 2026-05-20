@@ -9,11 +9,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var paster: Paster!
 
     private var modelReady = false
+    private var accessibilityGranted = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusBar = StatusBarController()
         statusBar.onQuit = { NSApp.terminate(nil) }
-        statusBar.setState(.loading("Loading model…"))
+        statusBar.onOpenAccessibilitySettings = { Self.openAccessibilitySettings() }
 
         recorder = AudioRecorder()
         transcriber = Transcriber()
@@ -24,26 +25,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hotkey.register()
 
         requestMicrophonePermission()
-        promptForAccessibilityIfNeeded()
+        checkAccessibility()
+        refreshState()
 
         Task { [weak self] in
             guard let self else { return }
             do {
                 try await self.transcriber.loadModel()
                 self.modelReady = true
-                await MainActor.run {
-                    self.statusBar.setState(.idle)
-                }
+                await MainActor.run { self.refreshState() }
             } catch {
                 await MainActor.run {
                     self.statusBar.setState(.error("Model failed to load"))
-                    self.showAlert(
-                        title: "Murmur couldn't load the transcription model",
-                        message: "Check your internet connection (first run downloads ~150MB) and restart.\n\n\(error.localizedDescription)"
-                    )
+                    NSLog("Murmur: model load failed: \(error)")
                 }
             }
         }
+    }
+
+    private func refreshState() {
+        if !accessibilityGranted {
+            statusBar.setState(.needsAccessibility)
+        } else if !modelReady {
+            statusBar.setState(.loading("Loading model…"))
+        } else {
+            statusBar.setState(.idle)
+        }
+    }
+
+    private func checkAccessibility() {
+        let opts = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
+        accessibilityGranted = AXIsProcessTrustedWithOptions(opts)
+        if !accessibilityGranted {
+            // Re-poll every 2s so the icon updates as soon as the user grants it,
+            // without blocking the main thread on a modal alert.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                guard let self else { return }
+                let trusted = AXIsProcessTrusted()
+                if trusted != self.accessibilityGranted {
+                    self.accessibilityGranted = trusted
+                    self.refreshState()
+                }
+                if !self.accessibilityGranted {
+                    self.checkAccessibility()
+                }
+            }
+        }
+    }
+
+    static func openAccessibilitySettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        NSWorkspace.shared.open(url)
     }
 
     private func toggleRecording() {
@@ -79,36 +111,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 try recorder.start()
                 statusBar.setState(.recording)
             } catch {
-                showAlert(
-                    title: "Couldn't start recording",
-                    message: error.localizedDescription
-                )
+                NSLog("Murmur: couldn't start recording: \(error)")
+                statusBar.setState(.error("Recording failed — check Microphone permission"))
+                NSSound.beep()
             }
         }
     }
 
     private func requestMicrophonePermission() {
         AVCaptureDevice.requestAccess(for: .audio) { _ in }
-    }
-
-    private func promptForAccessibilityIfNeeded() {
-        let opts = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
-        let trusted = AXIsProcessTrustedWithOptions(opts)
-        if !trusted {
-            DispatchQueue.main.async {
-                self.showAlert(
-                    title: "Murmur needs Accessibility access",
-                    message: "Grant access in System Settings → Privacy & Security → Accessibility, then quit and relaunch Murmur. Without it, the global hotkey and auto-paste won't work."
-                )
-            }
-        }
-    }
-
-    private func showAlert(title: String, message: String) {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = message
-        alert.alertStyle = .warning
-        alert.runModal()
     }
 }
