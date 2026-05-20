@@ -53,21 +53,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private var accessibilityTimer: Timer?
+
     private func checkAccessibility() {
+        // Prompt the user the FIRST time only. Re-prompting steals focus from
+        // System Settings and prevents them from finishing the toggle.
         let opts = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
         accessibilityGranted = AXIsProcessTrustedWithOptions(opts)
+        refreshState()
+
         if !accessibilityGranted {
-            // Re-poll every 2s so the icon updates as soon as the user grants it,
-            // without blocking the main thread on a modal alert.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                guard let self else { return }
-                let trusted = AXIsProcessTrusted()
-                if trusted != self.accessibilityGranted {
-                    self.accessibilityGranted = trusted
+            // Silent poll — AXIsProcessTrusted() does not prompt.
+            accessibilityTimer?.invalidate()
+            accessibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+                guard let self else { timer.invalidate(); return }
+                if AXIsProcessTrusted() {
+                    self.accessibilityGranted = true
                     self.refreshState()
-                }
-                if !self.accessibilityGranted {
-                    self.checkAccessibility()
+                    timer.invalidate()
+                    self.accessibilityTimer = nil
                 }
             }
         }
